@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}DBS{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* ✅ Centralized Animated Background */
+    .animated-bg {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0; /* Remove extra padding */
+      background: linear-gradient(-45deg, #23a6d5, #23d5ab, #ee7752, #e73c7e);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ✅ Fully Transparent Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.02); /* Fully transparent */
+      backdrop-filter: blur(20px);
+      box-shadow: none;
+    }
+
+    /* ✅ Glassmorphic Form Styling - Improved Blending */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(25px);
+      border-radius: 15px;
+      padding: 20px;
+      border: none;
+      box-shadow: none;
+      min-width: 350px;
+      max-width: 500px;
+      width: 100%;
+      margin: auto; /* Ensures proper centering */
+      max-height: 90vh; /* Prevents unnecessary stretching */
+    }
+
+    /* ✅ Reduce Input Spacing */
+    .glass-card .mb-3 {
+      margin-bottom: 8px; /* Tighten input spacing */
+    }
+
+    /* ✅ Fix Input Padding */
+    .glass-card input {
+      padding: 8px;
+    }
+
+    /* ✅ Form Control */
+    .form-control {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .form-control::placeholder {
+      color: #ddd;
+    }
+
+    .form-control:focus {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.4);
+    }
+
+    /* ✅ Toast Container */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1050;
+    }
+  </style>
+</head>
+<body class="animated-bg">
+  <!-- ✅ Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'home' %}">DBS Bank</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+          {% if request.path == '/login/' %}
+            <li class="nav-item">
+              <a class="btn btn-outline-light" href="{% url 'register' %}">Register</a>
+            </li>
+          {% elif request.path == '/register/' %}
+            <li class="nav-item">
+              <a class="btn btn-outline-light" href="{% url 'login' %}">Login</a>
+            </li>
+          {% else %}
+            {% if request.user.is_authenticated %}
+              <li class="nav-item me-3 navbar-text text-white">
+                Hello, {{ request.user.username }}
+              </li>
+              <li class="nav-item">
+                <a class="btn btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+              </li>
+            {% endif %}
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ✅ Toast Messages -->
+  <div class="toast-container">
+    {% for message in messages %}
+      <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="me-auto">Notification</strong>
+          <small>Just now</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+          {{ message }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- ✅ Page Content -->
+  <div class="container-content">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+      var toastList = toastElList.map(function (toastEl) {
+        return new bootstrap.Toast(toastEl)
+      });
+
+      toastList.forEach(toast => toast.show());
+    });
+  </script>
+</body>
+</html>

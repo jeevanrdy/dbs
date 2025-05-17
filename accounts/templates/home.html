@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}DBS Home{% endblock %}
+
+{% block content %}
+<div class="glass-card text-white">
+  <h3 class="text-center">Welcome, {{ request.user.username }}</h3>
+  <hr>
+
+  {% if account %}
+    <p><strong>Account Number:</strong> {{ account.account_number }}</p>
+    <p><strong>Balance:</strong> ₹{{ account.balance }}</p>
+  {% else %}
+    <p>No account found. Please register again.</p>
+  {% endif %}
+
+  <hr>
+  <h5>Transfer Money</h5>
+  <form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="to_account" class="form-label">Transfer To</label>
+      <select name="to_account" id="to_account" class="form-select" required>
+        <option value="" selected disabled>Select account</option>
+        {% for acc in all_accounts %}
+          {% if acc.account_number != account.account_number %}
+            <option value="{{ acc.account_number }}">{{ acc.user.username }} - {{ acc.account_number }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="amount" class="form-label">Amount</label>
+      <input type="number" step="0.01" name="amount" id="amount" class="form-control" min="1" required>
+    </div>
+    <button type="submit" class="btn btn-light w-100">Send</button>
+  </form>
+
+  <!-- ✅ Transaction History Section -->
+  <hr>
+  <h5>Transaction History</h5>
+  {% if transactions %}
+    <ul class="list-group">
+      {% for transaction in transactions %}
+        <li class="list-group-item bg-transparent text-white">
+          {% if transaction.sender == account %}
+            Sent ₹{{ transaction.amount }} to {{ transaction.receiver.user.username }}
+          {% else %}
+            Received ₹{{ transaction.amount }} from {{ transaction.sender.user.username }}
+          {% endif %}
+          <small class="text-muted d-block">On {{ transaction.timestamp }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-center">No transactions yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
